@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Моя озвучка аниме</title>
+    <style>
+        body {
+            font-family: Arial;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+            background: #1a1a2e;
+            color: white;
+        }
+        .scene {
+            background: #16213e;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+        .scene video {
+            width: 100%;
+            border-radius: 10px;
+            background: black;
+        }
+        .controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        button {
+            background: #e94560;
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        button:hover {
+            background: #c73652;
+            transform: scale(1.05);
+        }
+        button.stop {
+            background: #555;
+        }
+        button.stop:hover {
+            background: #777;
+        }
+        .status {
+            background: #0f3460;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+        .player-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: #0f3460;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            border-top: 3px solid #e94560;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🎬 Моя озвучка аниме</h1>
+    <p>Нажми «▶️ Воспроизвести с озвучкой», чтобы увидеть сцену и услышать мой голос:</p>
+
+    <div id="sceneList"></div>
+
+    <div class="player-bar" id="nowPlaying">⏸️ Выбери сцену</div>
+
+    <script>
+        // 👇 СЮДА ПРОПИШИ СВОИ ФАЙЛЫ
+        const scenes = [
+            {
+                name: "Сцена 1",
+                video: "scene1.mp4",
+                audio: "scene1_audio.mp3"
+            },
+            {
+                name: "Сцена 2",
+                video: "scene2.mp4",
+                audio: "scene2_audio.mp3"
+            }
+        ];
+
+        const sceneListDiv = document.getElementById('sceneList');
+        const nowPlayingDiv = document.getElementById('nowPlaying');
+        let currentVideo = null;
+        let currentAudio = null;
+
+        scenes.forEach((scene, index) => {
+            const sceneDiv = document.createElement('div');
+            sceneDiv.className = 'scene';
+
+            const video = document.createElement('video');
+            video.src = `video/${scene.video}`;
+            video.muted = true;
+            video.controls = false;
+            video.preload = 'metadata';
+
+            const audio = document.createElement('audio');
+            audio.src = `video/${scene.audio}`;
+            audio.preload = 'metadata';
+
+            const controlsDiv = document.createElement('div');
+            controlsDiv.className = 'controls';
+            controlsDiv.innerHTML = `
+                <button onclick="playScene(${index})">▶️ Воспроизвести с озвучкой</button>
+                <button class="stop" onclick="stopScene()">⏹️ Остановить</button>
+                <span class="status" id="status_${index}">⏸️ Готово</span>
+            `;
+
+            sceneDiv.appendChild(video);
+            sceneDiv.appendChild(controlsDiv);
+            sceneListDiv.appendChild(sceneDiv);
+
+            scene.videoElement = video;
+            scene.audioElement = audio;
+        });
+
+        function playScene(index) {
+            const scene = scenes[index];
+            const video = scene.videoElement;
+            const audio = scene.audioElement;
+
+            stopScene();
+
+            video.currentTime = 0;
+            audio.currentTime = 0;
+
+            video.play();
+            audio.play();
+
+            document.getElementById(`status_${index}`).textContent = '▶️ Играет';
+            nowPlayingDiv.textContent = `🎬 Сейчас: ${scene.name}`;
+
+            video.onended = function() {
+                audio.pause();
+                audio.currentTime = 0;
+                document.getElementById(`status_${index}`).textContent = '✅ Завершено';
+                nowPlayingDiv.textContent = '⏸️ Воспроизведение завершено';
+            };
+
+            currentVideo = video;
+            currentAudio = audio;
+        }
+
+        function stopScene() {
+            if (currentVideo) {
+                currentVideo.pause();
+                currentVideo.currentTime = 0;
+            }
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio.currentTime = 0;
+            }
+            nowPlayingDiv.textContent = '⏸️ Остановлено';
+        }
+    </script>
+
+</body>
+</html>
+
+
+
